@@ -8,7 +8,7 @@ st.title("dbplyr Code Generator")
 st.markdown("Enter your data manipulation instructions and get clean dbplyr R code")
 
 # API key input
-api_key = st.text_input("Anthropic API Key", os.getenv("ANTHROPIC_API_KEY", ""))
+api_key = os.getenv("ANTHROPIC_API_KEY", "")
 
 # Instructions input
 instructions = st.text_area(
