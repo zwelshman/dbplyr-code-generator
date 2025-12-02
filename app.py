@@ -28,16 +28,40 @@ if st.button("Generate Code", type="primary"):
                 client = anthropic.Anthropic(api_key=api_key)
                 
                 message = client.messages.create(
-                    model="claude-sonnet-4-20250514",
-                    max_tokens=1000,
-                    system="You are a dbplyr code generator. Return ONLY clean, executable R code using dbplyr syntax. No explanations, no markdown code blocks, no comments, no preamble. Just the raw R code that can be directly copied and pasted.",
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": f"Generate dbplyr R code for the following instructions. Return ONLY the R code with no explanations, no markdown formatting, no comments, and no extra text. Just raw executable dbplyr code.\n\nInstructions: {instructions}"
-                        }
-                    ]
-                )
+                model="claude-sonnet-4-20250514",
+                max_tokens=2000,  # Increased for more complex queries
+                system="""You are an expert dbplyr code generator. Generate R code using dbplyr syntax that translates to efficient SQL.
+            
+            CRITICAL OUTPUT REQUIREMENTS:
+            - Return ONLY executable R code
+            - NO markdown code blocks (no ```r or ```)
+            - NO explanations, comments, or preamble
+            - NO natural language before or after the code
+            - Start directly with R code (e.g., 'con %>%' or 'library(dbplyr)')
+            
+            CODE REQUIREMENTS:
+            - Use dbplyr verbs (filter, select, mutate, summarise, etc.)
+            - Assume database connection exists as 'con'
+            - Use appropriate SQL translations via dbplyr
+            - Handle date/time operations with dbplyr-compatible functions
+            - Include necessary library() calls only if essential
+            
+            QUALITY STANDARDS:
+            - Produce syntactically correct R code
+            - Use efficient dbplyr patterns
+            - Handle edge cases (NULLs, type conversions)
+            - Use proper quoting for column names with spaces or special characters""",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"""Generate dbplyr R code for these instructions:
+            
+            {instructions}
+            
+            Remember: Output ONLY raw R code. No explanations. No markdown. Start with the code itself."""
+                    }
+                ]
+            )
                 
                 # Extract code from response
                 code = message.content[0].text.strip()
